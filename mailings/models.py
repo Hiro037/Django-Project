@@ -79,7 +79,7 @@ class Mailing(models.Model):
 
 class MailingAttempt(models.Model):
     # Попытка рассылки
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True) #Дата и время попытки
     status = models.CharField(
         choices=[("SUCCESS", "Успешно"), ("FAILURE", "Не успешно")],
         verbose_name="Статус попытки рассылки",
