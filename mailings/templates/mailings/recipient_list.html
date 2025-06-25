@@ -1,0 +1,38 @@
+{% extends "mailings/base.html "%}
+{% block content %}
+<main class="container my-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Список клиентов</h2>
+          <button class="btn btn-success btn-add" href="{% url 'mailings:RecipientCreateView' %">Добавить клиента</button>
+      </div>
+
+      <!-- Client List Table -->
+      <table class="table table-striped table-hover">
+          <thead class="table-dark">
+              <tr>
+                  <th scope="col">Имя</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Комментарий</th>
+                  <th scope="col">Пользователь системы рассылки</th>
+                  <th scope="col">Действия</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for recipient in object_list %}
+              {% if user == recipient.owner %}
+              <tr>
+                  <td>{{recipient.full_name}}</td>
+                  <td>{{recipient.email}}</td>
+                  <td>{{recipient.comment}}</td>
+                  <td>{{recipient.owner}}</td>
+                  <td>
+                      <button class="btn btn-primary btn-sm me-2" href="{% url 'mailings:RecipientUpdateView' recipient.pk %}">Редактировать</button>
+                      <button class="btn btn-danger btn-sm" href="{% url 'mailings:RecipientDeleteView' recipient.pk %}">Удалить</button>
+                  </td>
+              </tr>
+              {% endif %}
+              {% endfor %}
+          </tbody>
+      </table>
+  </main>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "mailings/base.html "%}
+{% block content %}
+<main class="container my-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+          {% if object %}
+          <h2>Изменить данные о клиенте</h2>
+          {% else %}
+          <h2>Добавить клиента</h2>
+          {% endif %}
+          <button class="btn btn-success btn-add" data-bs-toggle="modal" data-bs-target="#addClientModal">Добавить клиента</button>
+      </div>
+
+      <div class="card-body">
+                    <form method="post" action="" enctype="multipart/form-data" class="form-floating">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            <div>
+                                {{ field.label_tag }} {{ field }}
+                                {% if field.errors %}
+                                    <span style="color: red;">{{ field.errors }}</span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        {% if object %}
+                        <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Изменить товар</button>
+                        {% else %}
+                        <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Добавить товар</button>
+                        {% endif %}
+                        <a href="{% url 'catalog:home' %}" class="btn btn-secondary">Назад к списку</a>
+                    </form>
+                </div>
+
+  </main>
+{% endblock %}
