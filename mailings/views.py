@@ -3,7 +3,7 @@ from django.views.generic import ListView, DetailView, UpdateView, DeleteView, C
 
 from .models import Recipient, Message, Mailing, MailingAttempt
 
-# from .forms import RecipientForm
+from .forms import RecipientForm
 
 class RecipientListView(ListView):
     model = Recipient
@@ -14,13 +14,13 @@ class RecipientDetailView(DetailView):
 class RecipientUpdateView(UpdateView):
     model = Recipient
     pass
-    # form_class = RecipientForm
-    #
-    # def get_form_class(self):
-    #     user = self.request.user
-    #     if user == self.object.owner:
-    #         return RecipientForm
-    #     return PermissionError
+    form_class = RecipientForm
+
+    def get_form_class(self):
+        user = self.request.user
+        if user == self.object.owner:
+            return RecipientForm
+        return PermissionError
 
 class RecipientDeleteView(DeleteView):
     model = Recipient
@@ -29,14 +29,14 @@ class RecipientDeleteView(DeleteView):
 class RecipientCreateView(CreateView):
     model = Recipient
     pass
-    # form_class = RecipientForm
-    #
-    # def form_valid(self, form_class):
-    #     recipient = form_class.save()
-    #     user = self.request.user
-    #     recipient.owner = user
-    #     recipient.save()
-    #     return super().form_valid(form_class)
+    form_class = RecipientForm
+
+    def form_valid(self, form_class):
+        recipient = form_class.save()
+        user = self.request.user
+        recipient.owner = user
+        recipient.save()
+        return super().form_valid(form_class)
 
 class MessageListView(ListView):
     model = Message
