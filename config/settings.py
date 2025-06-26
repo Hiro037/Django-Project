@@ -132,3 +132,34 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.User"
+
+# Настройки для электронной почты рассылки
+EMAIL = os.getenv('EMAIL')
+PASSWORD = os.getenv('PASSWORD')
+
+# Информация для gmail.com
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = EMAIL
+EMAIL_HOST_PASSWORD = PASSWORD #Cпециально сгенерированный пароль приложения
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+# Информация для mail.ru
+# EMAIL_HOST = 'smtp.mail.ru'
+# EMAIL_PORT = 2525
+# EMAIL_HOST_USER = EMAIL
+# EMAIL_HOST_PASSWORD = PASSWORD
+# EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = False
+
+# Информация для yandex.ru
+# EMAIL_HOST = 'smtp.yandex.ru'
+# EMAIL_PORT = 465
+# EMAIL_HOST_USER = EMAIL
+# EMAIL_HOST_PASSWORD = PASSWORD
+# EMAIL_USE_TLS = False
+# EMAIL_USE_SSL = True
+
+SERVER_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
