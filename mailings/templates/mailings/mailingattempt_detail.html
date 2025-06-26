@@ -1,0 +1,19 @@
+{% extends 'mailings/base.html' %}
+{% load my_tags %}
+{% block content %}
+<div class="container mt-5">
+        <h1 class="text-center mb-4">Описание попытки рассылки</h1>
+        <div class="card">
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Дата попытки рассылки:</strong> {{object.timestamp}}</li>
+                    <li class="list-group-item"><strong>Статус рассылки:</strong> {{object.status}}.</li>
+                    <li class="list-group-item"><strong>Ответ сервера:</strong> {{object.server_response}}</li>
+                    <li class="list-group-item"><strong>Пользователь системы рассылки:</strong> {{object.mailing.owner}}.</li>
+                </ul>
+                <div class="card-body">
+                    <a href="{% url 'mailings:MailingAttemptListView' %}" class="btn btn-secondary">Назад к списку</a>
+                </div>
+            </div>
+        </div>
+{% endblock %}

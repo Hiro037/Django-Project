@@ -1,6 +1,6 @@
 from django.urls import path
 from .apps import MailingsConfig
-from .views import RecipientListView,RecipientDetailView,RecipientDeleteView, RecipientCreateView, RecipientUpdateView, MessageCreateView, MessageDeleteView, MessageDetailView, MessageUpdateView, MessageListView, MailingCreateView, MailingUpdateView, MailingDeleteView, MailingDetailView, MailingListView, MailingAttemptCreateView, MailingAttemptDeleteView, MailingAttemptDetailView, MailingAttemptUpdateView, MailingAttemptListView
+from .views import RecipientListView,RecipientDetailView,RecipientDeleteView, RecipientCreateView, RecipientUpdateView, MessageCreateView, MessageDeleteView, MessageDetailView, MessageUpdateView, MessageListView, MailingCreateView, MailingUpdateView, MailingDeleteView, MailingDetailView, MailingListView, MailingAttemptDetailView, MailingAttemptListView
 
 app_name = MailingsConfig.name
 
@@ -22,7 +22,4 @@ urlpatterns = [
     path("mailings/create/", MailingCreateView.as_view(), name="MailingCreateView"),
     path("mailing-attempts/", MailingAttemptListView.as_view(), name="MailingAttemptListView"),
     path("mailing-attempts/detail/<int:pk>/", MailingAttemptDetailView.as_view(), name="MailingAttemptDetailView"),
-    path("mailing-attempts/update/<int:pk>/", MailingAttemptUpdateView.as_view(), name="MailingAttemptUpdateView"),
-    path("mailing-attempts/delete/<int:pk>/", MailingAttemptDeleteView.as_view(), name="MailingAttemptDeleteView"),
-    path("mailing-attempts/create/", MailingAttemptCreateView.as_view(), name="MailingAttemptCreateView"),
 ]

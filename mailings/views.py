@@ -1,35 +1,38 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
 
 from .models import Recipient, Message, Mailing, MailingAttempt
 
-from .forms import RecipientForm
+from .forms import RecipientForm, MessageForm, MailingForm
 
-class RecipientListView(ListView):
+
+class RecipientListView(LoginRequiredMixin, ListView):
     model = Recipient
 
-class RecipientDetailView(DetailView):
+class RecipientDetailView(LoginRequiredMixin, DetailView):
     model = Recipient
 
-class RecipientUpdateView(UpdateView):
+class RecipientUpdateView(LoginRequiredMixin, UpdateView):
     model = Recipient
-    pass
     form_class = RecipientForm
+    success_url = reverse_lazy('mailings:RecipientListView')
 
-    def get_form_class(self):
-        user = self.request.user
-        if user == self.object.owner:
-            return RecipientForm
-        return PermissionError
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.owner != request.user:
+            raise PermissionDenied("Это не ваш клиент.")
+        return super().dispatch(request, *args, **kwargs)
 
-class RecipientDeleteView(DeleteView):
+class RecipientDeleteView(LoginRequiredMixin, DeleteView):
     model = Recipient
-    success_url = reverse_lazy('mailings:RecipientListVew')
+    success_url = reverse_lazy('mailings:RecipientListView')
 
-class RecipientCreateView(CreateView):
+class RecipientCreateView(LoginRequiredMixin, CreateView):
     model = Recipient
-    pass
     form_class = RecipientForm
+    success_url = reverse_lazy('mailings:RecipientListView')
 
     def form_valid(self, form_class):
         recipient = form_class.save()
@@ -38,62 +41,86 @@ class RecipientCreateView(CreateView):
         recipient.save()
         return super().form_valid(form_class)
 
-class MessageListView(ListView):
+class MessageListView(LoginRequiredMixin, ListView):
     model = Message
-    pass
 
-class MessageDetailView(DetailView):
+class MessageDetailView(LoginRequiredMixin, DetailView):
     model = Message
-    pass
 
-class MessageUpdateView(UpdateView):
+class MessageUpdateView(LoginRequiredMixin, UpdateView):
     model = Message
-    pass
+    form_class = MessageForm
+    success_url = reverse_lazy('mailings:MessageListView')
 
-class MessageDeleteView(DeleteView):
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.owner != request.user:
+            raise PermissionDenied("Вы не являетесь владельцем этого сообщения.")
+        return super().dispatch(request, *args, **kwargs)
+
+class MessageDeleteView(LoginRequiredMixin, DeleteView):
     model = Message
-    pass
+    success_url = reverse_lazy('mailings:MessageListView')
 
-class MessageCreateView(CreateView):
+class MessageCreateView(LoginRequiredMixin, CreateView):
     model = Message
-    pass
+    form_class = MessageForm
+    success_url = reverse_lazy('mailings:MessageListView')
 
-class MailingListView(ListView):
+    def form_valid(self, form_class):
+        message = form_class.save()
+        user = self.request.user
+        message.owner = user
+        message.save()
+        return super().form_valid(form_class)
+
+class MailingListView(LoginRequiredMixin, ListView):
     model = Mailing
-    pass
 
-class MailingDetailView(DetailView):
+class MailingDetailView(LoginRequiredMixin, DetailView):
     model = Mailing
-    pass
 
-class MailingUpdateView(UpdateView):
+class MailingUpdateView(LoginRequiredMixin, UpdateView):
     model = Mailing
-    pass
+    form_class = MailingForm
+    success_url = reverse_lazy('mailings:MailingListView')
 
-class MailingDeleteView(DeleteView):
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.owner != request.user:
+            raise PermissionDenied("Вы не являетесь владельцем этой рассылки.")
+        if self.object.status != "CREATED":
+            raise PermissionDenied("Рассылку можно редактировать только до её отправки.")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['message'].queryset = Message.objects.filter(owner=self.request.user)
+        form.fields['recipients'].queryset = Recipient.objects.filter(owner=self.request.user)
+        return form
+
+class MailingDeleteView(LoginRequiredMixin, DeleteView):
     model = Mailing
-    pass
+    success_url = reverse_lazy('mailings:MailingListView')
 
-class MailingCreateView(CreateView):
+class MailingCreateView(LoginRequiredMixin, CreateView):
     model = Mailing
-    pass
+    form_class = MailingForm
+    success_url = reverse_lazy('mailings:MailingListView')
 
-class MailingAttemptListView(ListView):
-    model = MailingAttempt
-    pass
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['message'].queryset = Message.objects.filter(owner=self.request.user)
+        form.fields['recipients'].queryset = Recipient.objects.filter(owner=self.request.user)
+        return form
 
-class MailingAttemptDetailView(DetailView):
-    model = MailingAttempt
-    pass
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        form.instance.status = "CREATED"
+        return super().form_valid(form)
 
-class MailingAttemptUpdateView(UpdateView):
+class MailingAttemptListView(LoginRequiredMixin, ListView):
     model = MailingAttempt
-    pass
 
-class MailingAttemptDeleteView(DeleteView):
+class MailingAttemptDetailView(LoginRequiredMixin, DetailView):
     model = MailingAttempt
-    pass
-
-class MailingAttemptCreateView(CreateView):
-    model = MailingAttempt
-    pass

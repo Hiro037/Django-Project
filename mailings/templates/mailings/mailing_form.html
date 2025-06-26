@@ -3,9 +3,9 @@
 <main class="container my-5">
       <div class="d-flex justify-content-between align-items-center mb-4">
           {% if object %}
-          <h2>Изменить данные о клиенте</h2>
+          <h2>Изменить рассылку</h2>
           {% else %}
-          <h2>Добавить клиента</h2>
+          <h2>Добавить рассылку</h2>
           {% endif %}
       </div>
 
@@ -21,11 +21,11 @@
                     </div>
                 {% endfor %}
                 {% if object %}
-                <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Изменить данные о клиенте</button>
+                <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Изменить рассылку</button>
                 {% else %}
-                <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Добавить клиента</button>
+                <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Добавить рассылку</button>
                 {% endif %}
-                <a href="{% url 'mailings:RecipientListView' %}" class="btn btn-secondary">Назад к списку</a>
+                <a href="{% url 'mailings:MailingListView' %}" class="btn btn-secondary">Назад к списку</a>
             </form>
       </div>
 </main>
