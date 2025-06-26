@@ -30,3 +30,5 @@ def send_mailing(mailing_id):
                                          server_response='В рассылке нет клиентов',
                                          mailing=mailing)
         mailing_attempt.save()
+
+    return mailing_attempt

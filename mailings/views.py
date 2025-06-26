@@ -1,11 +1,14 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
 
 from .models import Recipient, Message, Mailing, MailingAttempt
 
 from .forms import RecipientForm, MessageForm, MailingForm
+
+from .services import send_mailing
 
 
 class RecipientListView(LoginRequiredMixin, ListView):
@@ -124,3 +127,13 @@ class MailingAttemptListView(LoginRequiredMixin, ListView):
 
 class MailingAttemptDetailView(LoginRequiredMixin, DetailView):
     model = MailingAttempt
+
+
+def mailingattempt(request, mailind_id):
+    if request.user == Mailing.objects.get(id=mailind_id).owner:
+        attempt = send_mailing(mailind_id)
+        context = {'object': attempt}
+        return render(request, 'mailings/mailingattempt_detail.html', context)
+    else:
+        raise PermissionDenied('Это не ваша рассылка')
+
