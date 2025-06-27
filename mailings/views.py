@@ -1,8 +1,8 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView, TemplateView
 
 from .models import Recipient, Message, Mailing, MailingAttempt
 
@@ -129,11 +129,28 @@ class MailingAttemptDetailView(LoginRequiredMixin, DetailView):
     model = MailingAttempt
 
 
-def mailingattempt(request, mailind_id):
-    if request.user == Mailing.objects.get(id=mailind_id).owner:
-        attempt = send_mailing(mailind_id)
-        context = {'object': attempt}
-        return render(request, 'mailings/mailingattempt_detail.html', context)
-    else:
+def mailingattempt(request, mailing_id):
+    mailing = get_object_or_404(Mailing, id=mailing_id)
+
+    if mailing.owner != request.user:
         raise PermissionDenied('Это не ваша рассылка')
 
+    attempt = send_mailing(mailing_id)
+    context = {'object': attempt}
+    return render(request, 'mailings/mailingattempt_detail.html', context)
+
+class HomePageView(LoginRequiredMixin, TemplateView):
+    template_name = 'mailings/dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        mailings = Mailing.objects.filter(owner=user)
+        recipients = Recipient.objects.filter(owner=user)
+
+        context['mailings_count'] = mailings.count()
+        context['active_mailings_count'] = mailings.filter(status='STARTED').count()
+        context['recipients_count'] = recipients.count()
+
+        return context

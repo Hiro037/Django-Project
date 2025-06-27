@@ -24,9 +24,7 @@
                   <td>{{message.body}}</td>
                   <td>{{message.owner}}</td>
                   <td>
-                      <a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:MessageUpdateView' message.pk %}">Редактировать</a>
-                      <a class="btn btn-danger btn-sm" href="{% url 'mailings:MessageDeleteView' message.pk %}">Удалить</a>
-                  </td>
+                      <a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:MessageDetailView' message.pk %}">Подробнее</a></td>
               </tr>
               {% endif %}
               {% endfor %}

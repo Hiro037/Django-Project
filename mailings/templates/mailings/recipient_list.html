@@ -26,8 +26,7 @@
                   <td>{{recipient.comment}}</td>
                   <td>{{recipient.owner}}</td>
                   <td>
-                      <a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:RecipientUpdateView' recipient.pk %}">Редактировать</a>
-                      <a class="btn btn-danger btn-sm" href="{% url 'mailings:RecipientDeleteView' recipient.pk %}">Удалить</a>
+                      <a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:RecipientDetailView' recipient.pk %}">Подробнее</a>
                   </td>
               </tr>
               {% endif %}
