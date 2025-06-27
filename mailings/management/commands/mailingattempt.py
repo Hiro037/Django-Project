@@ -1,5 +1,7 @@
 from django.core.management import BaseCommand
+
 from mailings.services import send_mailing
+
 
 # Команда создает попытку рассылки
 class Command(BaseCommand):

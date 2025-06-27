@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -134,14 +135,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
 
 # Настройки для электронной почты рассылки
-EMAIL = os.getenv('EMAIL')
-PASSWORD = os.getenv('PASSWORD')
+EMAIL = os.getenv("EMAIL")
+PASSWORD = os.getenv("PASSWORD")
 
 # Информация для gmail.com
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_HOST_USER = EMAIL
-EMAIL_HOST_PASSWORD = PASSWORD #Cпециально сгенерированный пароль приложения
+EMAIL_HOST_PASSWORD = PASSWORD  # Cпециально сгенерированный пароль приложения
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 

@@ -1,5 +1,7 @@
 from django.contrib import admin
-from.models import Recipient, Message, Mailing, MailingAttempt
+
+from .models import Recipient, Message, Mailing, MailingAttempt
+
 
 @admin.register(Recipient)
 class RecipientAdmin(admin.ModelAdmin):
@@ -9,8 +11,7 @@ class RecipientAdmin(admin.ModelAdmin):
         "comment",
         "owner",
     )
-    list_filter = (
-        "owner",)
+    list_filter = ("owner",)
     search_fields = (
         "email",
         "full_name",
@@ -28,8 +29,8 @@ class MessageAdmin(admin.ModelAdmin):
         "subject",
         "owner",
     )
-    list_filter = (
-        "owner",)
+    list_filter = ("owner",)
+
 
 @admin.register(Mailing)
 class MailingAdmin(admin.ModelAdmin):
@@ -45,13 +46,11 @@ class MailingAdmin(admin.ModelAdmin):
         "message",
         "owner",
     )
-    list_filter = (
-        "owner",
-        "status"
-    )
+    list_filter = ("owner", "status")
+
 
 @admin.register(MailingAttempt)
-class MessageAdmin(admin.ModelAdmin):
+class MailingAttemptAdmin(admin.ModelAdmin):
     list_display = (
         "timestamp",
         "status",
@@ -63,4 +62,5 @@ class MessageAdmin(admin.ModelAdmin):
     )
     list_filter = (
         "status",
-        "mailing",)
+        "mailing",
+    )

@@ -1,10 +1,12 @@
-from django.forms import ModelForm, DateTimeInput
-from .models import Recipient,Message, Mailing
+from django.forms import DateTimeInput, ModelForm
+
+from .models import Mailing, Message, Recipient
+
 
 class RecipientForm(ModelForm):
     class Meta:
         model = Recipient
-        fields = ['email', 'full_name', 'comment']
+        fields = ["email", "full_name", "comment"]
 
     def __init__(self, *args, **kwargs):
         super(RecipientForm, self).__init__(*args, **kwargs)
@@ -35,10 +37,11 @@ class RecipientForm(ModelForm):
             }
         )
 
+
 class MessageForm(ModelForm):
     class Meta:
         model = Message
-        fields = ['subject', 'body']
+        fields = ["subject", "body"]
 
     def __init__(self, *args, **kwargs):
         super(MessageForm, self).__init__(*args, **kwargs)
@@ -60,12 +63,12 @@ class MessageForm(ModelForm):
             }
         )
 
+
 class MailingForm(ModelForm):
     class Meta:
         model = Mailing
-        fields = ['start_time', 'end_time', 'message', 'recipients']
+        fields = ["start_time", "end_time", "message", "recipients"]
         widgets = {
-            'start_time': DateTimeInput(attrs={'type': 'datetime-local'}),
-            'end_time': DateTimeInput(attrs={'type': 'datetime-local'}),
+            "start_time": DateTimeInput(attrs={"type": "datetime-local"}),
+            "end_time": DateTimeInput(attrs={"type": "datetime-local"}),
         }
-
