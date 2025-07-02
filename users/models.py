@@ -29,12 +29,18 @@ class User(AbstractUser):
         max_length=100, verbose_name="Токен", blank=True, null=True
     )
 
+    is_active = models.BooleanField(default=True)
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
+        permissions = [
+            ("can_see_all_users", "Может просматривать всех пользователей"),
+            ("can_deactivate_users", "Может блокировать пользователей"),
+        ]
 
     def __str__(self):
         return self.email

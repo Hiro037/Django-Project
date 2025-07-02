@@ -9,7 +9,7 @@ from django.contrib.auth.views import (
 from django.urls import path, reverse_lazy
 
 from users.apps import UsersConfig
-from users.views import UserRegisterView, email_verification
+from users.views import UserRegisterView, email_verification, UserListView, UserDetailView
 
 app_name = UsersConfig.name
 
@@ -49,4 +49,7 @@ urlpatterns = [
         ),
         name="password_reset_complete",
     ),
+    path("user-list/", UserListView.as_view(), name='UserListView'),
+    path('user-detail/<int:pk>/', UserDetailView.as_view(), name='UserDetailView')
+
 ]

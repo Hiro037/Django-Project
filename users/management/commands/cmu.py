@@ -35,12 +35,15 @@ class Command(BaseCommand):
             ct_mailing = ContentType.objects.get_for_model(Mailing)
             view_all_mailings_perm = Permission.objects.get(codename='can_view_all_mailings',content_type=ct_mailing)
             disable_mailings_perm = Permission.objects.get(codename='can_disable_mailings', content_type=ct_mailing)
+            ct_user = ContentType.objects.get_for_model(User)
+            see_all_users_perm = Permission.objects.get(codename='can_see_all_users', content_type=ct_user)
+            deactivate_users_perm = Permission.objects.get(codename='can_deactivate_users', content_type=ct_user)
         except Permission.DoesNotExist as e:
             self.stderr.write(self.style.ERROR(f'Ошибка: {e}'))
             return
 
         # Добавляем права группе
-        group.permissions.add(view_all_recipients_perm, view_all_messages_perm, view_all_mailings_perm, disable_mailings_perm)
+        group.permissions.add(view_all_recipients_perm, view_all_messages_perm, view_all_mailings_perm, disable_mailings_perm, see_all_users_perm, deactivate_users_perm)
 
         # Добавляем пользователя в группу
         user.groups.add(group)

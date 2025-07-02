@@ -1,0 +1,38 @@
+{% extends "mailings/base.html "%}
+{% block content %}
+<main class="container my-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Список пользователей</h2>
+      </div>
+
+      <!-- Client List Table -->
+      <table class="table table-striped table-hover">
+          <thead class="table-dark">
+              <tr>
+                  <th scope="col">Email</th>
+                  <th scope="col">Номер телефона</th>
+                  <th scope="col">Страна</th>
+                  <th scope="col">Статус</th>
+                  <th scope="col">Действия</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for object in object_list %}
+              <tr>
+                  <td>{{object.email}}</td>
+                  <td>{{object.phone_number}}</td>
+                  <td>{{object.country}}</td>
+                  {% if object.is_active == True%}
+                  <td>Активен</td>
+                  {% else %}
+                  <td>Заблокирован</td>
+                  {% endif %}
+                  <td>
+                      <a class="btn btn-primary btn-sm me-2" href="{% url 'users:UserDetailView' object.pk %}">Подробнее</a>
+                  </td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  </main>
+{% endblock %}
