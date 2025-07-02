@@ -2,14 +2,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    ListView,
-    TemplateView,
-    UpdateView,
-)
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  TemplateView, UpdateView)
 
 from .forms import MailingForm, MessageForm, RecipientForm
 from .models import Mailing, MailingAttempt, Message, Recipient
@@ -22,10 +16,10 @@ class RecipientListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        if user.has_perm('can_view_all_recipients'):
-            context['object_list'] = Recipient.objects.all()
+        if user.has_perm("can_view_all_recipients"):
+            context["object_list"] = Recipient.objects.all()
         else:
-            context['object_list'] = Recipient.objects.filter(owner=user)
+            context["object_list"] = Recipient.objects.filter(owner=user)
         return context
 
 
@@ -66,10 +60,10 @@ class MessageListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        if user.has_perm('can_view_all_messages'):
-            context['object_list'] = Message.objects.all()
+        if user.has_perm("can_view_all_messages"):
+            context["object_list"] = Message.objects.all()
         else:
-            context['object_list'] = Message.objects.filter(owner=user)
+            context["object_list"] = Message.objects.filter(owner=user)
         return context
 
 
@@ -110,10 +104,10 @@ class MailingListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        if user.has_perm('can_view_all_mailings'):
-            context['object_list'] = Mailing.objects.all()
+        if user.has_perm("can_view_all_mailings"):
+            context["object_list"] = Mailing.objects.all()
         else:
-            context['object_list'] = Mailing.objects.filter(owner=user)
+            context["object_list"] = Mailing.objects.filter(owner=user)
         return context
 
 
