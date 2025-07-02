@@ -19,6 +19,15 @@ from .services import send_mailing
 class RecipientListView(LoginRequiredMixin, ListView):
     model = Recipient
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        if user.has_perm('can_view_all_recipients'):
+            context['object_list'] = Recipient.objects.all()
+        else:
+            context['object_list'] = Recipient.objects.filter(owner=user)
+        return context
+
 
 class RecipientDetailView(LoginRequiredMixin, DetailView):
     model = Recipient
@@ -46,16 +55,22 @@ class RecipientCreateView(LoginRequiredMixin, CreateView):
     form_class = RecipientForm
     success_url = reverse_lazy("mailings:RecipientListView")
 
-    def form_valid(self, form_class):
-        recipient = form_class.save()
-        user = self.request.user
-        recipient.owner = user
-        recipient.save()
-        return super().form_valid(form_class)
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
 
 class MessageListView(LoginRequiredMixin, ListView):
     model = Message
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        if user.has_perm('can_view_all_messages'):
+            context['object_list'] = Message.objects.all()
+        else:
+            context['object_list'] = Message.objects.filter(owner=user)
+        return context
 
 
 class MessageDetailView(LoginRequiredMixin, DetailView):
@@ -84,20 +99,42 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
     form_class = MessageForm
     success_url = reverse_lazy("mailings:MessageListView")
 
-    def form_valid(self, form_class):
-        message = form_class.save()
-        user = self.request.user
-        message.owner = user
-        message.save()
-        return super().form_valid(form_class)
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
 
 class MailingListView(LoginRequiredMixin, ListView):
     model = Mailing
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        if user.has_perm('can_view_all_mailings'):
+            context['object_list'] = Mailing.objects.all()
+        else:
+            context['object_list'] = Mailing.objects.filter(owner=user)
+        return context
+
 
 class MailingDetailView(LoginRequiredMixin, DetailView):
     model = Mailing
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        # Только владелец или менеджер может менять статус активности
+        is_owner = self.object.owner == request.user
+        is_manager = request.user.has_perm("mailings.can_disable_mailings")
+
+        if not (is_owner or is_manager):
+            raise PermissionDenied("Вы не можете изменить состояние этой рассылки.")
+
+        self.object.is_active = not self.object.is_active
+        self.object.save()
+
+        context = {"object": self.object, "toggled": True}
+        return render(request, "mailings/mailing_detail.html", context)
 
 
 class MailingUpdateView(LoginRequiredMixin, UpdateView):

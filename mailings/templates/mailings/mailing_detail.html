@@ -21,15 +21,28 @@
                     <li class="list-group-item"><strong>Пользователь системы рассылки:</strong> {{object.owner}}.</li>
                 </ul>
                 <div class="card-body">
-                    <td>
+                    <div class="mb-3">
                         {% if user == object.owner %}
                         <a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:MailingAttempt' object.pk %}">Начать рассылку</a>
                         <a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:MailingUpdateView' object.pk %}">Редактировать</a>
-                        <a class="btn btn-danger btn-sm" href="{% url 'mailings:MailingDeleteView' object.pk %}">Удалить</a>
+                        <a class="btn btn-danger btn-sm me-2" href="{% url 'mailings:MailingDeleteView' object.pk %}">Удалить</a>
                         {% endif %}
-                    </td>
-                    <a href="{% url 'mailings:MailingListView' %}" class="btn btn-secondary">Назад к списку</a>
+
+                        {% if user == object.owner or perms.mailings.can_disable_mailings %}
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                {% if object.is_active %}
+                                <button type="submit" class="btn btn-warning btn-sm">Отключить рассылку</button>
+                                {% else %}
+                                <button type="submit" class="btn btn-success btn-sm">Включить рассылку</button>
+                                {% endif %}
+                            </form>
+                        {% endif %}
+
+                        <a href="{% url 'mailings:MailingListView' %}" class="btn btn-secondary btn-sm">Назад к списку</a>
+                    </div>
                 </div>
             </div>
         </div>
+</div>
 {% endblock %}

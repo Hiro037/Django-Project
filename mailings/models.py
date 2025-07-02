@@ -63,6 +63,7 @@ class Mailing(models.Model):
     owner = models.ForeignKey(
         to="users.User", on_delete=models.SET_NULL, blank=True, null=True
     )
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = "Рассылка"
