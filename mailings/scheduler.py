@@ -1,14 +1,14 @@
-from apscheduler.schedulers.background import BackgroundScheduler
-from django_apscheduler.jobstores import DjangoJobStore
-from django.utils import timezone
-
 import logging
 from datetime import datetime
 
-from .services import send_mailing
-from .models import Mailing
-logger = logging.getLogger(__name__)
+from apscheduler.schedulers.background import BackgroundScheduler
+from django.utils import timezone
+from django_apscheduler.jobstores import DjangoJobStore
 
+from .models import Mailing
+from .services import send_mailing
+
+logger = logging.getLogger(__name__)
 
 
 def check_mailings():
@@ -27,7 +27,6 @@ def check_mailings():
                 send_mailing(mailing_id=mailing.id)
             except Exception as e:
                 logger.exception(f"Ошибка при отправке рассылки {mailing.id}: {e}")
-
 
 
 def start():

@@ -9,5 +9,6 @@ class MailingsConfig(AppConfig):
 
     def ready(self):
         from .scheduler import start
+
         if os.getenv("RUN_MAIN") == "true":
             start()
