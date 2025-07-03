@@ -5,9 +5,12 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   TemplateView, UpdateView)
-from django.utils import timezone
+
 from .forms import MailingForm, MessageForm, RecipientForm
 from .models import Mailing, MailingAttempt, Message, Recipient
 from .services import send_mailing
@@ -205,6 +208,7 @@ def mailingattempt(request, mailing_id):
     return render(request, "mailings/mailingattempt_detail.html", context)
 
 
+@method_decorator(cache_page(60 * 5), name="dispatch")
 class HomePageView(LoginRequiredMixin, TemplateView):
     template_name = "mailings/dashboard.html"
 
@@ -216,19 +220,21 @@ class HomePageView(LoginRequiredMixin, TemplateView):
         mailings = Mailing.objects.filter(owner=user)
         recipients = Recipient.objects.filter(owner=user)
         mailing_attempts = MailingAttempt.objects.filter(
-                    mailing__in=mailings,
-                    timestamp__gte=last_month  # попытки не старше 30 дней
+            mailing__in=mailings, timestamp__gte=last_month  # попытки не старше 30 дней
         )
         success_mailing_attempts = mailing_attempts.filter(status="SUCCESS")
         failure_mailing_attempts = mailing_attempts.filter(status="FAILURE")
-        sent_emails = success_mailing_attempts.aggregate(Sum("emails_sent"))["emails_sent__sum"] or 0
+        sent_emails = (
+            success_mailing_attempts.aggregate(Sum("emails_sent"))["emails_sent__sum"]
+            or 0
+        )
 
         context["mailings_count"] = mailings.count()
         context["active_mailings_count"] = mailings.filter(status="STARTED").count()
         context["recipients_count"] = recipients.count()
-        context['mailing_attempts'] = mailing_attempts.count()
+        context["mailing_attempts"] = mailing_attempts.count()
         context["success_mailing_attempts"] = success_mailing_attempts.count()
-        context['failure_mailing_attempts'] = failure_mailing_attempts.count()
-        context['sent_emails'] = sent_emails
+        context["failure_mailing_attempts"] = failure_mailing_attempts.count()
+        context["sent_emails"] = sent_emails
 
         return context

@@ -35,7 +35,7 @@ def send_mailing(mailing_id):
             status="SUCCESS",
             server_response=f"Успешно отправлено {result} сообщений из {len(recipients)}.",
             mailing=mailing,
-            email_sent=result
+            email_sent=result,
         )
         mailing.status = "FINISHED"
         mailing.save()
