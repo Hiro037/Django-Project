@@ -1,0 +1,35 @@
+{% extends 'mailings/base.html' %}
+{% block content %}
+<div class="container mt-5">
+        <h1 class="text-center mb-4">Описание рассылки</h1>
+        <div class="card">
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Дата начала рассылки:</strong> {{object.start_time}}</li>
+                    <li class="list-group-item"><strong>Дата окончания рассылки:</strong> {{object.end_time}}</li>
+                    <li class="list-group-item"><strong>Статус рассылки:</strong>
+                        {% if object.status == "CREATED" %}
+                        Создана
+                        {% elif object.status == "STARTED" %}
+                        Запущена
+                        {% elif object.status == "FINISHED" %}
+                        Завершена
+                        {% endif %}
+                        </li>
+                    <li class="list-group-item"><strong>Тема сообщения:</strong> {{object.message.subject}}</li>
+                    <li class="list-group-item"><strong>Тело сообщения:</strong> {{object.message.body}}</li>
+                    <li class="list-group-item"><strong>Пользователь системы рассылки:</strong> {{object.owner}}.</li>
+                </ul>
+                <div class="card-body">
+                    <td>
+                        {% if user == object.owner %}
+                        <a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:MailingAttempt' object.pk %}">Начать рассылку</a>
+                        <a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:MailingUpdateView' object.pk %}">Редактировать</a>
+                        <a class="btn btn-danger btn-sm" href="{% url 'mailings:MailingDeleteView' object.pk %}">Удалить</a>
+                        {% endif %}
+                    </td>
+                    <a href="{% url 'mailings:MailingListView' %}" class="btn btn-secondary">Назад к списку</a>
+                </div>
+            </div>
+        </div>
+{% endblock %}

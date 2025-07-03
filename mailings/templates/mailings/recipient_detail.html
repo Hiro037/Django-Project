@@ -1,0 +1,22 @@
+{% extends 'mailings/base.html' %}
+{% block content %}
+<div class="container mt-5">
+        <h1 class="text-center mb-4">Описание клиента</h1>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{object.email}}</h5>
+                <p class="card-text">{{object.full_name}}.</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Комментарий:</strong> {{object.comment}}</li>
+                    <li class="list-group-item"><strong>Пользователь системы рассылки:</strong> {{object.owner}}.</li>
+                </ul>
+                <div class="card-body">
+                    <td>
+                      <button class="btn btn-primary btn-sm me-2" href="{% url 'mailings:RecipientUpdateView' object.pk %}">Редактировать</button>
+                      <button class="btn btn-danger btn-sm" href="{% url 'mailings:RecipientDeleteView' object.pk %}">Удалить</button>
+                    </td>
+                    <a href="{% url 'mailings:RecipientListView' %}" class="btn btn-secondary">Назад к списку</a>
+                </div>
+            </div>
+        </div>
+{% endblock %}

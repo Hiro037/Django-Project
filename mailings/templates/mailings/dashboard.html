@@ -1,0 +1,32 @@
+{% extends "mailings/base.html "%}
+{% block content %}
+<main class="container my-5">
+  <div class="container">
+        <div class="row text-start">
+            <div class="col-lg-9 col-md-6 col-sm-12">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <tr>
+                                <td class="w-25">Общее количество рассылок</td>
+                                <td>{{mailings_count}}</td>
+                              <td><a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:MailingListView' %}">Подробнее</a></td>
+                            </tr>
+                            <tr>
+                                <td class="w-25">Активных рассылок</td>
+                                <td>{{active_mailings_count}}</td>
+                                <td><a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:MailingListView' %}">Подробнее</a></td>
+                            </tr>
+                            <tr>
+                                <td class="w-25">Клиентов</td>
+                                <td>{{recipients_count}}</td>
+                                <td><a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:RecipientListView' %}">Подробнее</a></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+  </div>
+</main>
+{% endblock %}

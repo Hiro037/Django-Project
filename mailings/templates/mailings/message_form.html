@@ -1,0 +1,32 @@
+{% extends "mailings/base.html "%}
+{% block content %}
+<main class="container my-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+          {% if object %}
+          <h2>Изменить сообщение</h2>
+          {% else %}
+          <h2>Добавить сообщение</h2>
+          {% endif %}
+      </div>
+
+      <div class="card-body">
+            <form method="post" action="" enctype="multipart/form-data" class="form-floating">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div>
+                        {{ field.label_tag }} {{ field }}
+                        {% if field.errors %}
+                            <span style="color: red;">{{ field.errors }}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                {% if object %}
+                <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Изменить сообщение</button>
+                {% else %}
+                <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Добавить сообщение</button>
+                {% endif %}
+                <a href="{% url 'mailings:MessageListView' %}" class="btn btn-secondary">Назад к списку</a>
+            </form>
+      </div>
+</main>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "mailings/base.html "%}
+{% block content %}
+<main class="container my-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Список попыток рассылки</h2>
+      </div>
+
+      <!-- Mailing List Table -->
+      <table class="table table-striped table-hover">
+          <thead class="table-dark">
+              <tr>
+                  <th scope="col">Дата и время попытки</th>
+                  <th scope="col">Статус</th>
+                  <th scope="col">Начало рассылки</th>
+                  <th scope="col">Пользователь системы рассылки</th>
+                  <th scope="col">Действия</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for mailing_attempt in object_list %}
+              {% if user == mailing_attempt.mailing.owner %}
+              <tr>
+                  <td>{{mailing_attempt.timestamp}}</td>
+                  {% if mailing_attempt.status == "SUCCESS" %}
+                  <td>Успешно</td>
+                  {% elif mailing_attempt.status == "FAILURE" %}
+                  <td>Не успешно</td>
+                  {% endif %}
+                  <td>{{mailing_attempt.mailing.start_time}}</td>
+                  <td>{{mailing_attempt.mailing.owner}}</td>
+                  <td>
+                      <a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:MailingAttemptDetailView' mailing_attempt.pk %}">Подробнее</a>
+                  </td>
+              </tr>
+              {% endif %}
+              {% endfor %}
+          </tbody>
+      </table>
+  </main>
+{% endblock %}

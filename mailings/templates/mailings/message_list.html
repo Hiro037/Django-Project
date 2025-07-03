@@ -1,0 +1,34 @@
+{% extends "mailings/base.html "%}
+{% block content %}
+<main class="container my-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Список сообщений</h2>
+          <a class="btn btn-success btn-add" href="{% url 'mailings:MessageCreateView' %}">Добавить сообщение</a>
+      </div>
+
+      <!-- Client List Table -->
+      <table class="table table-striped table-hover">
+          <thead class="table-dark">
+              <tr>
+                  <th scope="col">Тема письма</th>
+                  <th scope="col">Тело письма</th>
+                  <th scope="col">Пользователь системы рассылки</th>
+                  <th scope="col">Действия</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for message in object_list %}
+              {% if user == message.owner %}
+              <tr>
+                  <td>{{message.subject}}</td>
+                  <td>{{message.body}}</td>
+                  <td>{{message.owner}}</td>
+                  <td>
+                      <a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:MessageDetailView' message.pk %}">Подробнее</a></td>
+              </tr>
+              {% endif %}
+              {% endfor %}
+          </tbody>
+      </table>
+  </main>
+{% endblock %}
