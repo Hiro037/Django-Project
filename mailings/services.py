@@ -20,6 +20,10 @@ def send_mailing(mailing_id):
         )
         return attempt
 
+    if mailing.status != "CREATED":
+        logger.info(f"Рассылка {mailing_id} уже обработана, пропускаем")
+        return
+
     mailing.status = "STARTED"
     mailing.save()
 
