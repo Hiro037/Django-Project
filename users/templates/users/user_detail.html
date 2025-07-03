@@ -1,0 +1,30 @@
+{% extends 'mailings/base.html' %}
+{% block content %}
+<div class="container mt-5">
+        <h1 class="text-center mb-4">Описание пользователя</h1>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{object.email}}</h5>
+                <p class="card-text">{{object.phone_number}}.</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Страна:</strong> {{object.country}}</li>
+                    <li class="list-group-item"><strong>Статус:</strong>
+                    {% if object.is_active == True%}
+                    Активен
+                    {% else %}
+                    Заблокирован</li>
+                    {% endif %}
+                </ul>
+                <div class="card-body">
+                    <td>
+                        {% if object.is_active %}
+                        <button type="submit" class="btn btn-warning btn-sm">Заблокировать пользователя</button>
+                        {% else %}
+                        <button type="submit" class="btn btn-success btn-sm">Разблокировать пользователя</button>
+                        {% endif %}
+                    </td>
+                    <a href="{% url 'users:UserListView' %}" class="btn btn-secondary">Назад к списку</a>
+                </div>
+            </div>
+        </div>
+{% endblock %}

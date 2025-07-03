@@ -17,10 +17,25 @@
                                 <td>{{active_mailings_count}}</td>
                                 <td><a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:MailingListView' %}">Подробнее</a></td>
                             </tr>
+                        </table>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped">
                             <tr>
-                                <td class="w-25">Клиентов</td>
-                                <td>{{recipients_count}}</td>
-                                <td><a class="btn btn-primary btn-sm me-2" href="{% url 'mailings:RecipientListView' %}">Подробнее</a></td>
+                                <td class="w-25">Попыток рассылки за последний месяц:</td>
+                                <td>{{mailing_attempts}}</td>
+                            </tr>
+                            <tr>
+                                <td class="w-25">Из них успешных:</td>
+                                <td>{{success_mailing_attempts}}</td>
+                            </tr>
+                            <tr>
+                                <td class="w-25">Не успешных:</td>
+                                <td>{{failure_mailing_attempts}}</td>
+                            </tr>
+                            <tr>
+                                <td class="w-25">Всего отправленный сообщений за последний месяц:</td>
+                                <td>{{sent_emails}}</td>
                             </tr>
                         </table>
                     </div>

@@ -1,15 +1,15 @@
+from datetime import timedelta
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    ListView,
-    TemplateView,
-    UpdateView,
-)
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  TemplateView, UpdateView)
 
 from .forms import MailingForm, MessageForm, RecipientForm
 from .models import Mailing, MailingAttempt, Message, Recipient
@@ -18,6 +18,15 @@ from .services import send_mailing
 
 class RecipientListView(LoginRequiredMixin, ListView):
     model = Recipient
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        if user.has_perm("can_view_all_recipients"):
+            context["object_list"] = Recipient.objects.all()
+        else:
+            context["object_list"] = Recipient.objects.filter(owner=user)
+        return context
 
 
 class RecipientDetailView(LoginRequiredMixin, DetailView):
@@ -46,16 +55,22 @@ class RecipientCreateView(LoginRequiredMixin, CreateView):
     form_class = RecipientForm
     success_url = reverse_lazy("mailings:RecipientListView")
 
-    def form_valid(self, form_class):
-        recipient = form_class.save()
-        user = self.request.user
-        recipient.owner = user
-        recipient.save()
-        return super().form_valid(form_class)
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
 
 class MessageListView(LoginRequiredMixin, ListView):
     model = Message
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        if user.has_perm("can_view_all_messages"):
+            context["object_list"] = Message.objects.all()
+        else:
+            context["object_list"] = Message.objects.filter(owner=user)
+        return context
 
 
 class MessageDetailView(LoginRequiredMixin, DetailView):
@@ -84,20 +99,42 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
     form_class = MessageForm
     success_url = reverse_lazy("mailings:MessageListView")
 
-    def form_valid(self, form_class):
-        message = form_class.save()
-        user = self.request.user
-        message.owner = user
-        message.save()
-        return super().form_valid(form_class)
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
 
 class MailingListView(LoginRequiredMixin, ListView):
     model = Mailing
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        if user.has_perm("can_view_all_mailings"):
+            context["object_list"] = Mailing.objects.all()
+        else:
+            context["object_list"] = Mailing.objects.filter(owner=user)
+        return context
+
 
 class MailingDetailView(LoginRequiredMixin, DetailView):
     model = Mailing
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        # Только владелец или менеджер может менять статус активности
+        is_owner = self.object.owner == request.user
+        is_manager = request.user.has_perm("mailings.can_disable_mailings")
+
+        if not (is_owner or is_manager):
+            raise PermissionDenied("Вы не можете изменить состояние этой рассылки.")
+
+        self.object.is_active = not self.object.is_active
+        self.object.save()
+
+        context = {"object": self.object, "toggled": True}
+        return render(request, "mailings/mailing_detail.html", context)
 
 
 class MailingUpdateView(LoginRequiredMixin, UpdateView):
@@ -171,18 +208,33 @@ def mailingattempt(request, mailing_id):
     return render(request, "mailings/mailingattempt_detail.html", context)
 
 
+@method_decorator(cache_page(60 * 5), name="dispatch")
 class HomePageView(LoginRequiredMixin, TemplateView):
     template_name = "mailings/dashboard.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        last_month = timezone.now() - timedelta(days=30)
 
         mailings = Mailing.objects.filter(owner=user)
         recipients = Recipient.objects.filter(owner=user)
+        mailing_attempts = MailingAttempt.objects.filter(
+            mailing__in=mailings, timestamp__gte=last_month  # попытки не старше 30 дней
+        )
+        success_mailing_attempts = mailing_attempts.filter(status="SUCCESS")
+        failure_mailing_attempts = mailing_attempts.filter(status="FAILURE")
+        sent_emails = (
+            success_mailing_attempts.aggregate(Sum("emails_sent"))["emails_sent__sum"]
+            or 0
+        )
 
         context["mailings_count"] = mailings.count()
         context["active_mailings_count"] = mailings.filter(status="STARTED").count()
         context["recipients_count"] = recipients.count()
+        context["mailing_attempts"] = mailing_attempts.count()
+        context["success_mailing_attempts"] = success_mailing_attempts.count()
+        context["failure_mailing_attempts"] = failure_mailing_attempts.count()
+        context["sent_emails"] = sent_emails
 
         return context

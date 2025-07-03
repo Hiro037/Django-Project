@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from django.urls import reverse_lazy
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "users",
     "mailings",
+    'django_apscheduler',
 ]
 
 MIDDLEWARE = [
@@ -164,3 +166,40 @@ EMAIL_USE_SSL = False
 
 SERVER_EMAIL = EMAIL_HOST_USER
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+LOGIN_URL = reverse_lazy("users:login")
+LOGIN_REDIRECT_URL = reverse_lazy("mailings:HomePage")
+LOGOUT_REDIRECT_URL = reverse_lazy("mailings:HomePage")
+
+# Брокер кеширования Redis
+CACHE_ENABLED = True
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+    }
+}
+
+# Настройки для логирования
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'mailing.log',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'mailings': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
