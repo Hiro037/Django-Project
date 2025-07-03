@@ -1,10 +1,13 @@
+from datetime import timedelta
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
                                   TemplateView, UpdateView)
-
+from django.utils import timezone
 from .forms import MailingForm, MessageForm, RecipientForm
 from .models import Mailing, MailingAttempt, Message, Recipient
 from .services import send_mailing
@@ -208,12 +211,24 @@ class HomePageView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        last_month = timezone.now() - timedelta(days=30)
 
         mailings = Mailing.objects.filter(owner=user)
         recipients = Recipient.objects.filter(owner=user)
+        mailing_attempts = MailingAttempt.objects.filter(
+                    mailing__in=mailings,
+                    timestamp__gte=last_month  # попытки не старше 30 дней
+        )
+        success_mailing_attempts = mailing_attempts.filter(status="SUCCESS")
+        failure_mailing_attempts = mailing_attempts.filter(status="FAILURE")
+        sent_emails = success_mailing_attempts.aggregate(Sum("emails_sent"))["emails_sent__sum"] or 0
 
         context["mailings_count"] = mailings.count()
         context["active_mailings_count"] = mailings.filter(status="STARTED").count()
         context["recipients_count"] = recipients.count()
+        context['mailing_attempts'] = mailing_attempts.count()
+        context["success_mailing_attempts"] = success_mailing_attempts.count()
+        context['failure_mailing_attempts'] = failure_mailing_attempts.count()
+        context['sent_emails'] = sent_emails
 
         return context

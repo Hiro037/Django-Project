@@ -85,6 +85,7 @@ class MailingAttempt(models.Model):
     mailing = models.ForeignKey(
         to="Mailing", on_delete=models.SET_NULL, blank=True, null=True
     )
+    emails_sent = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name = "Попытка рассылки"
